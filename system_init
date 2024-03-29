@@ -1,0 +1,38 @@
+#!/bin/bash
+#执行该脚本文件前,要先给该文件添加执行权限 chmod +x script.sh
+# 上传该脚本(我创建了多次服务器实例,所以再次上传,要先删除已经存储的主机密钥) 
+# ssh-keygen -R 47.93.151.236 && scp ./system_init root@47.93.151.236:/root
+
+# 更新现有的包列表 在 Linux 中，你可以通过在命令后面添加 -y 参数来自动接受所有的提示，这样命令就会自动执行
+sudo apt-get update -y || { echo "Failed to update package list"; exit 1; }
+
+# 安装一些必要的工具
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release || { echo "Failed to install necessary tools"; exit 1; }
+
+# 添加 Docker 的官方 GPG 密钥
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg || { echo "Failed to add Docker's official GPG key"; exit 1; }
+
+# 设置 Docker 仓库
+echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null || { echo "Failed to set up Docker repository"; exit 1; }
+
+# 更新包列表
+sudo apt-get update -y || { echo "Failed to update package list"; exit 1; }
+
+# 安装 Docker
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io || { echo "Failed to install Docker"; exit 1; }
+
+# 下载 MongoDB 镜像
+sudo docker pull mongo || { echo "Failed to pull MongoDB Docker image"; exit 1; }
+
+# 在 home 主目录下创建一个 mongodb_data 文件夹
+mkdir ~/mongodb_data || { echo "Failed to create mongodb_data directory"; exit 1; }
+
+# 运行 MongoDB 容器，并将数据存储在刚刚创建的 mongodb_data 文件夹中
+sudo docker run -d -p 27017:27017 -v ~/mongodb_data:/data/db --name mongodb mongo || { echo "Failed to run MongoDB Docker container"; exit 1; }
