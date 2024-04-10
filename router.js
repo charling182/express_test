@@ -25,7 +25,8 @@ const routerMap = {
             updateData: {method: 'put'},
             updateManyData: {method: 'put'},
             deleteData: {method: 'delete'},
-            deleteManyData: {method: 'delete'}
+            deleteManyData: {method: 'delete'},
+            parseCsv: {method: 'get'}
         }
     }
 }

@@ -47,6 +47,7 @@ async function firstCollectionDeleteOne (p) {
 async function firstCollectionDeleteMany (p) {
     return await getCollection().deleteMany(p);
 }
+// 
 
 module.exports = {
     getCollection,

@@ -4,6 +4,13 @@
 # ssh-keygen -R 47.93.151.236 && scp ./system_init root@47.93.151.236:/root
 
 # 更新现有的包列表 在 Linux 中，你可以通过在命令后面添加 -y 参数来自动接受所有的提示，这样命令就会自动执行
+
+#在Linux系统中，当你尝试执行一个脚本（如system_init）并收到错误消息-bash: ./system_init: /bin/bash^M: bad interpreter:
+#No such file or directory时，这通常意味着脚本文件的第一行（即所谓的“shebang”行）存在编码问题或者与当前系统的换行符不兼容。
+
+#解决这个问题的方法 是在Linux环境下将脚本转换为Unix格式的换行符
+# 可以使用sed命令实现相同效果 $ sed -i 's/\r$//' system_init
+
 sudo apt-get update -y || { echo "Failed to update package list"; exit 1; }
 
 # 安装一些必要的工具

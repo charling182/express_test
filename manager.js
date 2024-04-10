@@ -1,4 +1,10 @@
 const dao = require('./dao');
+const fs = require('fs');
+const path = require('path');
+const csv = require('csv-parser');
+const iconv = require('iconv-lite');
+const chardet = require('chardet');
+
 const {
     getCollection,
     firstCollectionFindOne,
@@ -8,6 +14,25 @@ const {
     firstCollectionDeleteOne,
     firstCollectionDeleteMany
 } = require('./dao');
+
+// 解析csv文件
+function parseCsv() {
+    const data = [];
+    let filePath = path.resolve(__dirname, '测试数据.csv');
+    let buffer = fs.readFileSync(filePath);
+    let encoding = chardet.detect(buffer);
+    // console.log(encoding);
+    fs.createReadStream(filePath)
+    .pipe(iconv.decodeStream(encoding))  // 使用 'GB18030' 编码
+    .pipe(csv({ headers: ['name', 'age', 'city'] })) // 如果你提供了列名，csv-parser 将不会使用 CSV 文件的第一行作为列名。
+    .on('data', (row) => {
+        data.push(row);
+    })
+    .on('end', () => {
+        console.log('data', data);
+        postManyData(data);
+    });
+}
 
 async function postData(p) {
     try {
@@ -114,5 +139,6 @@ module.exports = {
     updateData,
     updateManyData,
     deleteData,
-    deleteManyData
+    deleteManyData,
+    parseCsv
 }
